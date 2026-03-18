@@ -32,8 +32,9 @@ npm install @supabase/supabase-js
 Create `/Users/magupe/Documents/proyects/ResiControl/.env` with this content:
 
 ```env
-VITE_SUPABASE_URL=YOUR_SUPABASE_URL_HERE
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY_HERE
+VITE_SUPABASE_URL=https://mtjqzyynenkefvcatfeb.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_PNSQUGu46lhSQ6zvEtj3uQ_X2vUZd79
+
 ```
 
 > These values will be filled by the user later. Leave as placeholders.
