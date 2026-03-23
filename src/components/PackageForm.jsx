@@ -44,6 +44,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
   function handlePhotoChange(e) {
     const file = e.target.files[0]
     if (file) {
+      console.log('Photo selected:', file.name, file.size, file.type)
       setPhoto(file)
       setPhotoPreview(URL.createObjectURL(file))
     }
@@ -59,6 +60,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
+    e.stopPropagation() // Prevenir recarga
     setError(null)
     if (!selectedTower || !selectedApartment) {
       setError('Por favor selecciona torre y apartamento.')
@@ -72,12 +74,16 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
 
     let photoUrl = null
     if (photo) {
+      console.log('Uploading photo:', photo.name)
       const { data: url, error: uploadError } = await uploadPhoto(photo)
       if (uploadError) {
+        console.error('Upload error:', uploadError)
         setError('Error al subir la foto. El paquete se registrará sin foto.')
-        console.error(uploadError)
       } else {
+        console.log('Photo uploaded successfully:', url)
         photoUrl = url
+      }
+    }
       }
     }
 
@@ -170,7 +176,6 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
           onChange={handlePhotoChange}
           style={{ display: 'none' }}
         />
