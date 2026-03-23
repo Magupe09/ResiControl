@@ -9,7 +9,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
   const [photoPreview, setPhotoPreview] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [notificationSent, setNotificationSent] = useState(false)
+  const [success, setSuccess] = useState(false)
   const fileInputRef = useRef(null)
 
   const torres = useMemo(() => {
@@ -96,8 +96,8 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
       return
     }
 
-    setNotificationSent(true)
-    setTimeout(() => setNotificationSent(false), 3000)
+    setSuccess(true)
+    setTimeout(() => setSuccess(false), 3000)
     setSelectedTower('')
     setSelectedApartment('')
     setResidentPhone('')
@@ -177,7 +177,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
       </div>
 
       {error && <p className="form-error">{error}</p>}
-      {notificationSent && <p className="form-success">✅ Notificación enviada al residente</p>}
+      {success && <p className="form-success">✅ Paquete registrado con éxito</p>}
       <button type="submit" className="btn-primary" disabled={loading}>
         {loading ? 'Registrando...' : '📦 Registrar Paquete'}
       </button>

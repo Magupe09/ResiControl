@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { supabase } from '../supabase'
 
 function ResidentPanel() {
@@ -8,6 +8,17 @@ function ResidentPanel() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [hasSearched, setHasSearched] = useState(false)
+
+  function formatDate(dateStr) {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    return date.toLocaleString('es-CO', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
 
   async function searchPackages() {
     if (!searchPhone.trim() && !searchApartment.trim()) {
@@ -50,25 +61,6 @@ function ResidentPanel() {
           placeholder="Tu número WhatsApp"
           value={searchPhone}
           onChange={(e) => setSearchPhone(e.target.value)}
-        />
-        <span className="search-or">ó</span>
-        <input
-          type="text"
-          placeholder="Tu apartamento"
-          value={searchApartment}
-          onChange={(e) => setSearchApartment(e.target.value)}
-        />
-        <button onClick={searchPackages} disabled={loading} className="btn-search">
-          {loading ? 'Buscando...' : '🔍 Buscar'}
-        </button>
-      </div>
-
-      <div className="resident-search">
-        <input
-          type="email"
-          placeholder="Tu email"
-          value={searchEmail}
-          onChange={(e) => setSearchEmail(e.target.value)}
         />
         <span className="search-or">ó</span>
         <input

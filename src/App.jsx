@@ -116,7 +116,12 @@ function App() {
                 </button>
                 <PackageForm 
                   guardId={currentGuard.id} 
-                  onPackageAdded={() => { handleRefresh(); handleBack(); }}
+                  onPackageAdded={() => { 
+                    setTimeout(() => {
+                      handleRefresh(); 
+                      handleBack(); 
+                    }, 2000) 
+                  }}
                   apartamentos={apartamentos}
                 />
               </div>

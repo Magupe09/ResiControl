@@ -7,7 +7,7 @@
 }
 
 .app-header {
-  width: 80%;
+  width: 100%;
   min-height: 100vh;
   margin: 0 auto;
   background: linear-gradient(180deg, #1a1a2e 0%, #0f172a 100%);
@@ -25,7 +25,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow-y: auto;
+  overflow-y: visible;
   padding: 1rem 0;
 }
 
@@ -1508,12 +1508,13 @@
 }
 
 .btn-back-action {
-  align-self: flex-start;
-  padding: 0.75rem 1rem;
-  background: #f1f5f9;
+  display: block;
+  margin: 0 auto 1rem auto;
+  background: #ef4444;
+  color: #ffffff;
+  padding: 0.75rem 2rem;
   border: none;
   border-radius: 0.5rem;
-  color: #475569;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -1521,5 +1522,5 @@
 }
 
 .btn-back-action:hover {
-  background: #e2e8f0;
+  background: #dc2626;
 }

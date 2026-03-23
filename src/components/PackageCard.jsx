@@ -5,6 +5,7 @@ function PackageCard({ pkg, onDelivered }) {
   const [loading, setLoading] = useState(false)
   const [showDeliverForm, setShowDeliverForm] = useState(false)
   const [receiverName, setReceiverName] = useState('')
+  const [success, setSuccess] = useState(false)
   const isDelivered = pkg.estado === 'entregado'
 
   async function handleMarkDelivered() {
@@ -20,7 +21,12 @@ function PackageCard({ pkg, onDelivered }) {
       alert('Error al marcar como entregado. Intenta de nuevo.')
       return
     }
-    onDelivered()
+    // Feedback de éxito antes de volver
+    setSuccess(true)
+    setTimeout(() => {
+      setSuccess(false)
+      onDelivered()
+    }, 1500)
   }
 
   function formatDate(dateStr) {
@@ -90,6 +96,7 @@ function PackageCard({ pkg, onDelivered }) {
               {loading ? 'Entregando...' : '✅ Confirmar Entrega'}
             </button>
           </div>
+          {success && <p className="form-success">✅ Entrega confirmada</p>}
         </div>
       </div>
     )
