@@ -186,6 +186,6 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
       </button>
     </form>
   )
-
+}
 
 export default PackageForm
