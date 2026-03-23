@@ -1,12 +1,31 @@
-import { useState } from 'react'
-import { markDelivered } from '../supabase'
+import { useState, useRef } from 'react'
+import { markDelivered, uploadPhoto } from '../supabase'
 
 function PackageCard({ pkg, onDelivered }) {
   const [loading, setLoading] = useState(false)
   const [showDeliverForm, setShowDeliverForm] = useState(false)
   const [receiverName, setReceiverName] = useState('')
   const [success, setSuccess] = useState(false)
+  const [deliveryPhoto, setDeliveryPhoto] = useState(null)
+  const [deliveryPhotoPreview, setDeliveryPhotoPreview] = useState(null)
+  const deliveryFileInputRef = useRef(null)
   const isDelivered = pkg.estado === 'entregado'
+
+  function handleDeliveryPhotoChange(e) {
+    const file = e.target.files[0]
+    if (file) {
+      setDeliveryPhoto(file)
+      setDeliveryPhotoPreview(URL.createObjectURL(file))
+    }
+  }
+
+  function removeDeliveryPhoto() {
+    setDeliveryPhoto(null)
+    setDeliveryPhotoPreview(null)
+    if (deliveryFileInputRef.current) {
+      deliveryFileInputRef.current.value = ''
+    }
+  }
 
   async function handleMarkDelivered() {
     if (!receiverName.trim()) {
@@ -14,7 +33,18 @@ function PackageCard({ pkg, onDelivered }) {
       return
     }
     setLoading(true)
-    const { error } = await markDelivered(pkg.id, receiverName.trim())
+
+    let deliveryPhotoUrl = null
+    if (deliveryPhoto) {
+      const { data: url, error: uploadError } = await uploadPhoto(deliveryPhoto)
+      if (uploadError) {
+        console.error('Error uploading delivery photo:', uploadError)
+      } else {
+        deliveryPhotoUrl = url
+      }
+    }
+
+    const { error } = await markDelivered(pkg.id, receiverName.trim(), deliveryPhotoUrl)
     setLoading(false)
     if (error) {
       console.error(error)
@@ -43,6 +73,11 @@ function PackageCard({ pkg, onDelivered }) {
   if (isDelivered) {
     return (
       <div className="package-card card-delivered">
+        {pkg.foto_entrega_url && (
+          <div className="card-photo">
+            <img src={pkg.foto_entrega_url} alt="Foto de entrega" />
+          </div>
+        )}
         <div className="card-header">
           <span className="card-badge">✅ Entregado</span>
           <span className="card-date">{formatDate(pkg.fecha_entrega)}</span>
@@ -77,12 +112,40 @@ function PackageCard({ pkg, onDelivered }) {
             onChange={(e) => setReceiverName(e.target.value)}
             className="receiver-input"
           />
+          <div className="form-group">
+            <label>Foto de entrega (opcional)</label>
+            {!deliveryPhotoPreview ? (
+              <button 
+                type="button" 
+                className="btn-photo"
+                onClick={() => deliveryFileInputRef.current?.click()}
+                disabled={loading}
+              >
+                📷 Agregar foto de entrega
+              </button>
+            ) : (
+              <div className="photo-preview">
+                <img src={deliveryPhotoPreview} alt="Preview" />
+                <button type="button" className="btn-remove-photo" onClick={removeDeliveryPhoto}>✕</button>
+              </div>
+            )}
+            <input
+              ref={deliveryFileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleDeliveryPhotoChange}
+              style={{ display: 'none' }}
+            />
+          </div>
           <div className="deliver-actions">
             <button 
               className="btn-cancel"
               onClick={() => {
                 setShowDeliverForm(false)
                 setReceiverName('')
+                setDeliveryPhoto(null)
+                setDeliveryPhotoPreview(null)
               }}
               disabled={loading}
             >

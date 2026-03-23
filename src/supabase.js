@@ -111,16 +111,25 @@ export async function getGuards() {
 /**
  * Mark a package as delivered.
  * @param {string} id - UUID of the package
+ * @param {string} receiverName - Name of the person receiving
+ * @param {string} deliveryPhotoUrl - Optional URL of delivery photo
  * @returns {Promise<{data, error}>}
  */
-export async function markDelivered(id, receiverName) {
+export async function markDelivered(id, receiverName, deliveryPhotoUrl = null) {
+  const updateData = { 
+    estado: 'entregado',
+    receptor: receiverName,
+    fecha_entrega: new Date().toISOString()
+  }
+  
+  // Add delivery photo if provided
+  if (deliveryPhotoUrl) {
+    updateData.foto_entrega_url = deliveryPhotoUrl
+  }
+  
   const { data, error } = await supabase
     .from('packages')
-    .update({ 
-      estado: 'entregado',
-      receptor: receiverName,
-      fecha_entrega: new Date().toISOString()
-    })
+    .update(updateData)
     .eq('id', id)
     .select()
   return { data, error }

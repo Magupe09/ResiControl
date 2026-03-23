@@ -1524,3 +1524,87 @@
 .btn-back-action:hover {
   background: #dc2626;
 }
+
+/* ── Admin Photo Modal ───────────────────────────── */
+.btn-photo-icon {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.photo-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.photo-modal-content {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  max-width: 500px;
+  width: 90%;
+}
+
+.photo-modal-content h3 {
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.photo-modal-address {
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.photo-modal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.photo-modal-item {
+  text-align: center;
+}
+
+.photo-label {
+  display: block;
+  color: #475569;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.photo-modal-item img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 0.5rem;
+  border: 2px solid #e2e8f0;
+}
+
+.btn-close-modal {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-close-modal:hover {
+  background: #2563eb;
+}

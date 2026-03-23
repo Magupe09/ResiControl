@@ -5,6 +5,7 @@ function AdminPanel({ currentGuard, onViewResident }) {
   const [packages, setPackages] = useState([])
   const [guards, setGuards] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedPhoto, setSelectedPhoto] = useState(null)
   const [filters, setFilters] = useState({
     tower: '',
     apartment: '',
@@ -190,6 +191,7 @@ function AdminPanel({ currentGuard, onViewResident }) {
           <table>
             <thead>
               <tr>
+                <th>Foto</th>
                 <th>Torre</th>
                 <th>Apto</th>
                 <th>Estado</th>
@@ -200,10 +202,21 @@ function AdminPanel({ currentGuard, onViewResident }) {
             </thead>
             <tbody>
               {packages.length === 0 ? (
-                <tr><td colSpan="6" className="no-data">No hay paquetes</td></tr>
+                <tr><td colSpan="7" className="no-data">No hay paquetes</td></tr>
               ) : (
                 packages.map(pkg => (
                   <tr key={pkg.id}>
+                    <td>
+                      {(pkg.foto_url || pkg.foto_entrega_url) ? (
+                        <button 
+                          className="btn-photo-icon"
+                          onClick={() => setSelectedPhoto(pkg)}
+                          title="Ver fotos"
+                        >
+                          📷
+                        </button>
+                      ) : '-'}
+                    </td>
                     <td>{pkg.torre}</td>
                     <td>{pkg.apartamento}</td>
                     <td>
@@ -219,6 +232,35 @@ function AdminPanel({ currentGuard, onViewResident }) {
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Modal para ver fotos */}
+      {selectedPhoto && (
+        <div className="photo-modal" onClick={() => setSelectedPhoto(null)}>
+          <div className="photo-modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Fotos del Paquete</h3>
+            <p className="photo-modal-address">
+              {selectedPhoto.torre} - Apto {selectedPhoto.apartamento}
+            </p>
+            <div className="photo-modal-grid">
+              {selectedPhoto.foto_url && (
+                <div className="photo-modal-item">
+                  <span className="photo-label">📦 Foto Recepción</span>
+                  <img src={selectedPhoto.foto_url} alt="Foto recepción" />
+                </div>
+              )}
+              {selectedPhoto.foto_entrega_url && (
+                <div className="photo-modal-item">
+                  <span className="photo-label">✅ Foto Entrega</span>
+                  <img src={selectedPhoto.foto_entrega_url} alt="Foto entrega" />
+                </div>
+              )}
+            </div>
+            <button className="btn-close-modal" onClick={() => setSelectedPhoto(null)}>
+              Cerrar
+            </button>
+          </div>
         </div>
       )}
     </div>
