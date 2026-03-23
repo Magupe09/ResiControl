@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Login from './components/Login'
 import PackageForm from './components/PackageForm'
 import PackageList from './components/PackageList'
 import AdminPanel from './components/AdminPanel'
 import ResidentPanel from './components/ResidentPanel'
-import { signOut } from './supabase'
+import { signOut, getApartamentos } from './supabase'
 import { config } from './config'
 import './App.css'
 
@@ -13,6 +13,15 @@ function App() {
   const [view, setView] = useState('dashboard')
   const [mainAction, setMainAction] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [apartamentos, setApartamentos] = useState([])
+
+  useEffect(() => {
+    async function loadApartamentos() {
+      const { data } = await getApartamentos()
+      if (data) setApartamentos(data)
+    }
+    loadApartamentos()
+  }, [])
 
   const isAdmin = currentGuard && (
     currentGuard.nombre.toLowerCase().includes('admin') || 
@@ -107,7 +116,8 @@ function App() {
                 </button>
                 <PackageForm 
                   guardId={currentGuard.id} 
-                  onPackageAdded={() => { handleRefresh(); handleBack(); }} 
+                  onPackageAdded={() => { handleRefresh(); handleBack(); }}
+                  apartamentos={apartamentos}
                 />
               </div>
             )}

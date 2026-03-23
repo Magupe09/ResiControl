@@ -20,6 +20,37 @@
   position: relative;
 }
 
+.header-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+
+.center-view {
+  width: 100%;
+  max-width: 100%;
+  color: #000000;
+}
+
+.center-view * {
+  color: #000000;
+}
+
+.package-form,
+.admin-panel,
+.resident-panel {
+  color: #000000;
+}
+
+.package-form *,
+.admin-panel *,
+.resident-panel * {
+  color: #000000;
+}
+
 /* Breakpoints para tablets y desktop */
 @media (min-width: 768px) {
   .app-header {

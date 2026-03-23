@@ -139,3 +139,12 @@ export async function uploadPhoto(file) {
   
   return { data: urlData.publicUrl, error: null }
 }
+
+export async function getApartamentos() {
+  const { data, error } = await supabase
+    .from('apartamentos')
+    .select('*')
+    .order('torre', { ascending: true })
+    .order('apartamento', { ascending: true })
+  return { data, error }
+}

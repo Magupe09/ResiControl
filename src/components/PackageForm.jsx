@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { insertPackage, uploadPhoto } from '../supabase'
 
-function PackageForm({ guardId, onPackageAdded }) {
-  const [tower, setTower] = useState('')
-  const [apartment, setApartment] = useState('')
+function PackageForm({ guardId, onPackageAdded, apartamentos }) {
+  const [selectedTower, setSelectedTower] = useState('')
+  const [selectedApartment, setSelectedApartment] = useState('')
   const [residentPhone, setResidentPhone] = useState('')
   const [photo, setPhoto] = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
@@ -11,6 +11,35 @@ function PackageForm({ guardId, onPackageAdded }) {
   const [error, setError] = useState(null)
   const [notificationSent, setNotificationSent] = useState(false)
   const fileInputRef = useRef(null)
+
+  const torres = useMemo(() => {
+    if (!apartamentos) return []
+    const unique = [...new Set(apartamentos.map(a => a.torre))]
+    return unique.sort()
+  }, [apartamentos])
+
+  const apartmentsInTower = useMemo(() => {
+    if (!apartamentos || !selectedTower) return []
+    return apartamentos
+      .filter(a => a.torre === selectedTower)
+      .sort((a, b) => a.apartamento.localeCompare(b.apartamento, undefined, { numeric: true }))
+  }, [apartamentos, selectedTower])
+
+  function handleTowerChange(e) {
+    const tower = e.target.value
+    setSelectedTower(tower)
+    setSelectedApartment('')
+    setResidentPhone('')
+  }
+
+  function handleApartmentChange(e) {
+    const aptId = e.target.value
+    setSelectedApartment(aptId)
+    const apt = apartmentsInTower.find(a => a.id === aptId)
+    if (apt?.telefono) {
+      setResidentPhone(apt.telefono)
+    }
+  }
 
   function handlePhotoChange(e) {
     const file = e.target.files[0]
@@ -31,11 +60,15 @@ function PackageForm({ guardId, onPackageAdded }) {
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
-    if (!tower.trim() || !apartment.trim()) {
-      setError('Por favor completa torre y apartamento.')
+    if (!selectedTower || !selectedApartment) {
+      setError('Por favor selecciona torre y apartamento.')
       return
     }
     setLoading(true)
+
+    const apt = apartmentsInTower.find(a => a.id === selectedApartment)
+    const towerLabel = selectedTower
+    const apartmentLabel = apt?.apartamento || ''
 
     let photoUrl = null
     if (photo) {
@@ -48,7 +81,13 @@ function PackageForm({ guardId, onPackageAdded }) {
       }
     }
 
-    const { error: supabaseError } = await insertPackage(tower.trim(), apartment.trim(), guardId, photoUrl, residentPhone.trim())
+    const { error: supabaseError } = await insertPackage(
+      towerLabel,
+      apartmentLabel,
+      guardId,
+      photoUrl,
+      residentPhone.trim()
+    )
     setLoading(false)
     
     if (supabaseError) {
@@ -59,8 +98,8 @@ function PackageForm({ guardId, onPackageAdded }) {
 
     setNotificationSent(true)
     setTimeout(() => setNotificationSent(false), 3000)
-    setTower('')
-    setApartment('')
+    setSelectedTower('')
+    setSelectedApartment('')
     setResidentPhone('')
     removePhoto()
     onPackageAdded()
@@ -71,34 +110,38 @@ function PackageForm({ guardId, onPackageAdded }) {
       <h2>Registrar Paquete</h2>
       <div className="form-group">
         <label htmlFor="tower">Torre</label>
-        <input
+        <select
           id="tower"
-          type="text"
-          placeholder="Ej: Torre 1, Torre A"
-          value={tower}
-          onChange={(e) => setTower(e.target.value)}
+          value={selectedTower}
+          onChange={handleTowerChange}
           disabled={loading}
-          autoComplete="off"
-        />
+        >
+          <option value="">Seleccionar torre...</option>
+          {torres.map(torre => (
+            <option key={torre} value={torre}>{torre}</option>
+          ))}
+        </select>
       </div>
       <div className="form-group">
         <label htmlFor="apartment">Apartamento</label>
-        <input
+        <select
           id="apartment"
-          type="text"
-          placeholder="Ej: 101, 302B"
-          value={apartment}
-          onChange={(e) => setApartment(e.target.value)}
-          disabled={loading}
-          autoComplete="off"
-        />
+          value={selectedApartment}
+          onChange={handleApartmentChange}
+          disabled={loading || !selectedTower}
+        >
+          <option value="">Seleccionar apartamento...</option>
+          {apartmentsInTower.map(apt => (
+            <option key={apt.id} value={apt.id}>{apt.apartamento}</option>
+          ))}
+        </select>
       </div>
       <div className="form-group">
-        <label htmlFor="residentPhone">WhatsApp del residente (opcional)</label>
+        <label htmlFor="residentPhone">WhatsApp del residente</label>
         <input
           id="residentPhone"
           type="tel"
-          placeholder="Ej: 3001234567"
+          placeholder="3001234567"
           value={residentPhone}
           onChange={(e) => setResidentPhone(e.target.value)}
           disabled={loading}
