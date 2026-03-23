@@ -6,6 +6,7 @@ function PackageList({ refreshKey, onDelivered }) {
   const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [filter, setFilter] = useState('')
 
   useEffect(() => {
     async function fetchPackages() {
@@ -21,28 +22,55 @@ function PackageList({ refreshKey, onDelivered }) {
       setLoading(false)
     }
     fetchPackages()
-  }, [refreshKey]) // re-fetches every time refreshKey changes
+  }, [refreshKey])
+
+  const pending = packages.filter(p => p.estado === 'registrado')
+  const delivered = packages.filter(p => p.estado === 'entregado')
+
+  const filteredPending = filter 
+    ? pending.filter(p => 
+        p.apartamento.toLowerCase().includes(filter.toLowerCase()) ||
+        p.torre.toLowerCase().includes(filter.toLowerCase())
+      )
+    : pending
+
+  const filteredDelivered = filter
+    ? delivered.filter(p => 
+        p.apartamento.toLowerCase().includes(filter.toLowerCase()) ||
+        p.torre.toLowerCase().includes(filter.toLowerCase())
+      )
+    : delivered
 
   if (loading) return <p className="list-status">Cargando paquetes...</p>
   if (error) return <p className="list-status list-error">{error}</p>
   if (packages.length === 0) return <p className="list-status">No hay paquetes registrados.</p>
 
-  const pending = packages.filter(p => p.status === 'pending')
-  const delivered = packages.filter(p => p.status === 'delivered')
-
   return (
     <div className="package-list">
-      <h2>Paquetes Pendientes ({pending.length})</h2>
-      {pending.length === 0 && (
-        <p className="list-status">✅ Todos los paquetes han sido entregados.</p>
+      <div className="list-filter">
+        <input
+          type="text"
+          placeholder="🔍 Buscar por torre o apartamento..."
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="filter-input"
+        />
+      </div>
+
+      <h2>Paquetes Pendientes ({filteredPending.length})</h2>
+      {filteredPending.length === 0 && (
+        <p className="list-status">
+          {filter ? '🔍 No hay coincidencias' : '✅ Todos los paquetes han sido entregados.'}
+        </p>
       )}
-      {pending.map(pkg => (
+      {filteredPending.map(pkg => (
         <PackageCard key={pkg.id} pkg={pkg} onDelivered={onDelivered} />
       ))}
-      {delivered.length > 0 && (
+      
+      {filteredDelivered.length > 0 && (
         <>
-          <h2 style={{ marginTop: '2rem' }}>Entregados Hoy ({delivered.length})</h2>
-          {delivered.map(pkg => (
+          <h2 style={{ marginTop: '2rem' }}>Entregados ({filteredDelivered.length})</h2>
+          {filteredDelivered.map(pkg => (
             <PackageCard key={pkg.id} pkg={pkg} onDelivered={onDelivered} />
           ))}
         </>

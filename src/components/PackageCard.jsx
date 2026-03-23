@@ -3,51 +3,119 @@ import { markDelivered } from '../supabase'
 
 function PackageCard({ pkg, onDelivered }) {
   const [loading, setLoading] = useState(false)
-  const isDelivered = pkg.status === 'delivered'
+  const [showDeliverForm, setShowDeliverForm] = useState(false)
+  const [receiverName, setReceiverName] = useState('')
+  const isDelivered = pkg.estado === 'entregado'
 
   async function handleMarkDelivered() {
+    if (!receiverName.trim()) {
+      alert('Por favor ingresa el nombre de quien recibe')
+      return
+    }
     setLoading(true)
-    const { error } = await markDelivered(pkg.id)
+    const { error } = await markDelivered(pkg.id, receiverName.trim())
     setLoading(false)
     if (error) {
       console.error(error)
       alert('Error al marcar como entregado. Intenta de nuevo.')
       return
     }
-    onDelivered() // notify parent to refresh list
+    onDelivered()
   }
 
-  // Format date: "17 mar 2026 - 06:00"
   function formatDate(dateStr) {
+    if (!dateStr) return ''
     const date = new Date(dateStr)
     return date.toLocaleString('es-CO', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
     })
   }
 
+  if (isDelivered) {
+    return (
+      <div className="package-card card-delivered">
+        <div className="card-header">
+          <span className="card-badge">✅ Entregado</span>
+          <span className="card-date">{formatDate(pkg.fecha_entrega)}</span>
+        </div>
+        <div className="card-body">
+          <p className="card-tower">{pkg.torre}</p>
+          <p className="card-apartment">Apto {pkg.apartamento}</p>
+        </div>
+        {pkg.receptor && (
+          <p className="card-receiver">Recibido por: {pkg.receptor}</p>
+        )}
+      </div>
+    )
+  }
+
+  if (showDeliverForm) {
+    return (
+      <div className="package-card card-pending">
+        <div className="card-header">
+          <span className="card-badge">📦 Pendiente</span>
+          <span className="card-date">{formatDate(pkg.created_at)}</span>
+        </div>
+        <div className="card-body">
+          <p className="card-tower">{pkg.torre}</p>
+          <p className="card-apartment">Apto {pkg.apartamento}</p>
+        </div>
+        <div className="deliver-form">
+          <input
+            type="text"
+            placeholder="Nombre de quien recibe"
+            value={receiverName}
+            onChange={(e) => setReceiverName(e.target.value)}
+            className="receiver-input"
+          />
+          <div className="deliver-actions">
+            <button 
+              className="btn-cancel"
+              onClick={() => {
+                setShowDeliverForm(false)
+                setReceiverName('')
+              }}
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+            <button 
+              className="btn-confirm-deliver"
+              onClick={handleMarkDelivered}
+              disabled={loading}
+            >
+              {loading ? 'Entregando...' : '✅ Confirmar Entrega'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className={`package-card ${isDelivered ? 'card-delivered' : 'card-pending'}`}>
+    <div className="package-card card-pending">
+      {pkg.foto_url && (
+        <div className="card-photo">
+          <img src={pkg.foto_url} alt="Foto del paquete" />
+        </div>
+      )}
       <div className="card-header">
-        <span className="card-badge">{isDelivered ? '✅ Entregado' : '📦 Pendiente'}</span>
+        <span className="card-badge">📦 Pendiente</span>
         <span className="card-date">{formatDate(pkg.created_at)}</span>
       </div>
       <div className="card-body">
-        <p className="card-tower">{pkg.tower}</p>
-        <p className="card-apartment">Apto {pkg.apartment}</p>
+        <p className="card-tower">{pkg.torre}</p>
+        <p className="card-apartment">Apto {pkg.apartamento}</p>
       </div>
-      {!isDelivered && (
-        <button
-          className="btn-deliver"
-          onClick={handleMarkDelivered}
-          disabled={loading}
-        >
-          {loading ? 'Marcando...' : '✅ Marcar como Entregado'}
-        </button>
-      )}
+      <button
+        className="btn-deliver"
+        onClick={() => setShowDeliverForm(true)}
+      >
+        📤 Marcar como Entregado
+      </button>
     </div>
   )
 }
