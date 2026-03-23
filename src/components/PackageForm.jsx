@@ -84,8 +84,6 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
         photoUrl = url
       }
     }
-      }
-    }
 
     const { error: supabaseError } = await insertPackage(
       towerLabel,
@@ -188,6 +186,6 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
       </button>
     </form>
   )
-}
+
 
 export default PackageForm
