@@ -31,7 +31,15 @@ function PackageCard({ pkg, onDelivered }) {
       
       setError(null)
       setDeliveryPhoto(file)
-      setDeliveryPhotoPreview(URL.createObjectURL(file))
+      
+      // Create preview with error handling
+      try {
+        const previewUrl = URL.createObjectURL(file)
+        setDeliveryPhotoPreview(previewUrl)
+      } catch (previewErr) {
+        console.error('Preview error:', previewErr)
+        setDeliveryPhotoPreview(null)
+      }
     } catch (err) {
       console.error('Error selecting photo:', err)
       setError('Error al seleccionar la foto.')
@@ -168,6 +176,10 @@ function PackageCard({ pkg, onDelivered }) {
               accept="image/*"
               capture="environment"
               onChange={handleDeliveryPhotoChange}
+              onClick={(e) => {
+                // Reset value to allow selecting same file again
+                e.target.value = ''
+              }}
               style={{ display: 'none' }}
             />
           </div>

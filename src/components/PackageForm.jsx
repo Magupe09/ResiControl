@@ -42,15 +42,46 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
   }
 
   function handlePhotoChange(e) {
-    const file = e.target.files[0]
-    if (file) {
+    try {
+      const file = e.target.files?.[0]
+      if (!file) return
+      
       console.log('Photo selected:', file.name, file.size, file.type)
+      
+      // Validate before setting
+      if (file.size > 5 * 1024 * 1024) {
+        setError('La foto es muy grande. Máximo 5MB.')
+        return
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        setError('Por favor selecciona una imagen válida.')
+        return
+      }
+      
+      setError(null)
       setPhoto(file)
-      setPhotoPreview(URL.createObjectURL(file))
+      
+      // Create preview with error handling
+      try {
+        const previewUrl = URL.createObjectURL(file)
+        setPhotoPreview(previewUrl)
+      } catch (previewErr) {
+        console.error('Preview error:', previewErr)
+        setPhotoPreview(null)
+      }
+    } catch (err) {
+      console.error('Photo change error:', err)
+      setError('Error al procesar la foto.')
     }
   }
 
   function removePhoto() {
+    if (photoPreview) {
+      try {
+        URL.revokeObjectURL(photoPreview)
+      } catch (e) {}
+    }
     setPhoto(null)
     setPhotoPreview(null)
     if (fileInputRef.current) {
@@ -176,7 +207,12 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
           ref={fileInputRef}
           type="file"
           accept="image/*"
+          capture="environment"
           onChange={handlePhotoChange}
+          onClick={(e) => {
+            // Reset value to allow selecting same file again
+            e.target.value = ''
+          }}
           style={{ display: 'none' }}
         />
       </div>
