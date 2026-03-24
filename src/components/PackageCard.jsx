@@ -13,37 +13,19 @@ function PackageCard({ pkg, onDelivered }) {
   const isDelivered = pkg.estado === 'entregado'
 
   function handleDeliveryPhotoChange(e) {
-    try {
-      const file = e.target.files[0]
-      if (!file) return
-      
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('La foto es muy grande. Máximo 5MB.')
-        return
-      }
-      
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setError('Por favor selecciona una imagen válida.')
-        return
-      }
-      
-      setError(null)
-      setDeliveryPhoto(file)
-      
-      // Create preview with error handling
-      try {
-        const previewUrl = URL.createObjectURL(file)
-        setDeliveryPhotoPreview(previewUrl)
-      } catch (previewErr) {
-        console.error('Preview error:', previewErr)
-        setDeliveryPhotoPreview(null)
-      }
-    } catch (err) {
-      console.error('Error selecting photo:', err)
-      setError('Error al seleccionar la foto.')
+    // Simple approach - just store the file directly
+    const file = e.target.files?.[0]
+    if (!file) return
+    
+    // Basic validation
+    if (file.size > 5 * 1024 * 1024) {
+      setError('La foto es muy grande. Máximo 5MB.')
+      return
     }
+    
+    setError(null)
+    setDeliveryPhoto(file)
+    // Skip preview to avoid potential issues
   }
 
   function removeDeliveryPhoto() {
@@ -174,12 +156,8 @@ function PackageCard({ pkg, onDelivered }) {
               ref={deliveryFileInputRef}
               type="file"
               accept="image/*"
-              capture="environment"
+              multiple={false}
               onChange={handleDeliveryPhotoChange}
-              onClick={(e) => {
-                // Reset value to allow selecting same file again
-                e.target.value = ''
-              }}
               style={{ display: 'none' }}
             />
           </div>
