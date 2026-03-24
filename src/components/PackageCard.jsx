@@ -6,16 +6,35 @@ function PackageCard({ pkg, onDelivered }) {
   const [showDeliverForm, setShowDeliverForm] = useState(false)
   const [receiverName, setReceiverName] = useState('')
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState(null)
   const [deliveryPhoto, setDeliveryPhoto] = useState(null)
   const [deliveryPhotoPreview, setDeliveryPhotoPreview] = useState(null)
   const deliveryFileInputRef = useRef(null)
   const isDelivered = pkg.estado === 'entregado'
 
   function handleDeliveryPhotoChange(e) {
-    const file = e.target.files[0]
-    if (file) {
+    try {
+      const file = e.target.files[0]
+      if (!file) return
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('La foto es muy grande. Máximo 5MB.')
+        return
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Por favor selecciona una imagen válida.')
+        return
+      }
+      
+      setError(null)
       setDeliveryPhoto(file)
       setDeliveryPhotoPreview(URL.createObjectURL(file))
+    } catch (err) {
+      console.error('Error selecting photo:', err)
+      setError('Error al seleccionar la foto.')
     }
   }
 
@@ -29,34 +48,48 @@ function PackageCard({ pkg, onDelivered }) {
 
   async function handleMarkDelivered() {
     if (!receiverName.trim()) {
-      alert('Por favor ingresa el nombre de quien recibe')
+      setError('Por favor ingresa el nombre de quien recibe')
       return
     }
     setLoading(true)
+    setError(null)
 
-    let deliveryPhotoUrl = null
-    if (deliveryPhoto) {
-      const { data: url, error: uploadError } = await uploadPhoto(deliveryPhoto)
-      if (uploadError) {
-        console.error('Error uploading delivery photo:', uploadError)
-      } else {
-        deliveryPhotoUrl = url
+    try {
+      let deliveryPhotoUrl = null
+      if (deliveryPhoto) {
+        console.log('Uploading delivery photo:', deliveryPhoto.name)
+        const { data: url, error: uploadError } = await uploadPhoto(deliveryPhoto)
+        if (uploadError) {
+          console.error('Error uploading delivery photo:', uploadError)
+          // Continue without photo - don't fail the delivery
+        } else {
+          console.log('Delivery photo uploaded:', url)
+          deliveryPhotoUrl = url
+        }
       }
-    }
 
-    const { error } = await markDelivered(pkg.id, receiverName.trim(), deliveryPhotoUrl)
-    setLoading(false)
-    if (error) {
-      console.error(error)
-      alert('Error al marcar como entregado. Intenta de nuevo.')
-      return
+      const { error } = await markDelivered(pkg.id, receiverName.trim(), deliveryPhotoUrl)
+      
+      if (error) {
+        console.error(error)
+        setError('Error al marcar como entregado. Intenta de nuevo.')
+        setLoading(false)
+        return
+      }
+      
+      // Success!
+      setSuccess(true)
+      setTimeout(() => {
+        setSuccess(false)
+        onDelivered()
+      }, 1500)
+      
+    } catch (err) {
+      console.error('Delivery exception:', err)
+      setError('Error inesperado. Intenta de nuevo.')
+    } finally {
+      setLoading(false)
     }
-    // Feedback de éxito antes de volver
-    setSuccess(true)
-    setTimeout(() => {
-      setSuccess(false)
-      onDelivered()
-    }, 1500)
   }
 
   function formatDate(dateStr) {
@@ -138,6 +171,7 @@ function PackageCard({ pkg, onDelivered }) {
               style={{ display: 'none' }}
             />
           </div>
+          {error && <p className="form-error">{error}</p>}
           <div className="deliver-actions">
             <button 
               className="btn-cancel"
