@@ -8,7 +8,6 @@ function PackageCard({ pkg, onDelivered }) {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
   const [deliveryPhoto, setDeliveryPhoto] = useState(null)
-  const [deliveryPhotoPreview, setDeliveryPhotoPreview] = useState(null)
   const deliveryFileInputRef = useRef(null)
   const isDelivered = pkg.estado === 'entregado'
 
@@ -30,7 +29,6 @@ function PackageCard({ pkg, onDelivered }) {
 
   function removeDeliveryPhoto() {
     setDeliveryPhoto(null)
-    setDeliveryPhotoPreview(null)
     if (deliveryFileInputRef.current) {
       deliveryFileInputRef.current.value = ''
     }
@@ -137,7 +135,7 @@ function PackageCard({ pkg, onDelivered }) {
           />
           <div className="form-group">
             <label>Foto de entrega (opcional)</label>
-            {!deliveryPhotoPreview ? (
+            {!deliveryPhoto ? (
               <button 
                 type="button" 
                 className="btn-photo"
@@ -148,7 +146,9 @@ function PackageCard({ pkg, onDelivered }) {
               </button>
             ) : (
               <div className="photo-preview">
-                <img src={deliveryPhotoPreview} alt="Preview" />
+                <span style={{ display: 'block', textAlign: 'center', padding: '0.5rem' }}>
+                  📷 {deliveryPhoto.name}
+                </span>
                 <button type="button" className="btn-remove-photo" onClick={removeDeliveryPhoto}>✕</button>
               </div>
             )}
@@ -156,8 +156,9 @@ function PackageCard({ pkg, onDelivered }) {
               ref={deliveryFileInputRef}
               type="file"
               accept="image/*"
-              multiple={false}
+              capture="environment"
               onChange={handleDeliveryPhotoChange}
+              onAbort={() => console.log('Camera aborted')}
               style={{ display: 'none' }}
             />
           </div>
@@ -169,7 +170,6 @@ function PackageCard({ pkg, onDelivered }) {
                 setShowDeliverForm(false)
                 setReceiverName('')
                 setDeliveryPhoto(null)
-                setDeliveryPhotoPreview(null)
               }}
               disabled={loading}
             >

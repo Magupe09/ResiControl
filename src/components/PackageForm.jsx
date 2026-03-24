@@ -166,7 +166,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
       
       <div className="form-group">
         <label>Foto del paquete (opcional)</label>
-        {!photoPreview ? (
+        {!photo ? (
           <button 
             type="button" 
             className="btn-photo"
@@ -177,7 +177,9 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
           </button>
         ) : (
           <div className="photo-preview">
-            <img src={photoPreview} alt="Preview" />
+            <span style={{ display: 'block', textAlign: 'center', padding: '0.5rem' }}>
+              📷 {photo.name}
+            </span>
             <button type="button" className="btn-remove-photo" onClick={removePhoto}>✕</button>
           </div>
         )}
@@ -185,8 +187,9 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          multiple={false}
+          capture="environment"
           onChange={handlePhotoChange}
+          onAbort={() => console.log('Camera aborted')}
           style={{ display: 'none' }}
         />
       </div>
