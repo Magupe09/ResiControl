@@ -84,6 +84,8 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
         photoUrl = url
       }
     }
+      
+    
 
     const { error: supabaseError } = await insertPackage(
       towerLabel,
@@ -107,7 +109,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
     setResidentPhone('')
     removePhoto()
     onPackageAdded()
-  }
+  } 
 
   return (
     <form className="package-form" onSubmit={handleSubmit}>

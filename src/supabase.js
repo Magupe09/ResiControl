@@ -3,7 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  }
+})
 
 export async function signIn(email, password) {
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -156,4 +162,36 @@ export async function getApartamentos() {
     .order('torre', { ascending: true })
     .order('apartamento', { ascending: true })
   return { data, error }
+}
+
+// ─── REALTIME SUBSCRIPTION ─────────────────────────────────────────────────────
+
+/**
+ * Subscribe to package changes (INSERT, UPDATE, DELETE)
+ * @param {function} callback - Called with { eventType, newRecord, oldRecord }
+ * @returns {function} - Call to unsubscribe
+ */
+export function subscribeToPackages(callback) {
+  const channel = supabase
+    .channel('packages-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'packages'
+      },
+      (payload) => {
+        callback({
+          eventType: payload.eventType,
+          new: payload.new,
+          old: payload.old
+        })
+      }
+    )
+    .subscribe()
+
+  return () => {
+    supabase.removeChannel(channel)
+  }
 }

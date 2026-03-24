@@ -1608,3 +1608,29 @@
 .btn-close-modal:hover {
   background: #2563eb;
 }
+
+/* ── Realtime Indicator ───────────────────────────── */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.realtime-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.35rem 0.6rem;
+  border-radius: 1rem;
+  white-space: nowrap;
+}
+
+.package-list .list-filter {
+  margin-bottom: 0;
+  flex: 1;
+}
