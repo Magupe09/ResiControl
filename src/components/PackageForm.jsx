@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo } from 'react'
 import { insertPackage, uploadPhoto } from '../supabase'
+import { compressImage } from '../utils/imageCompressor'
 
 function PackageForm({ guardId, onPackageAdded, apartamentos }) {
   const [selectedTower, setSelectedTower] = useState('')
@@ -8,6 +9,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
   const [photo, setPhoto] = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [compressing, setCompressing] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const fileInputRef = useRef(null)
@@ -41,22 +43,34 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
     }
   }
 
-  function handlePhotoChange(e) {
-    // Simple approach - just store the file directly
+  async function handlePhotoChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
     
-    console.log('Photo selected:', file.name, file.size, file.type)
+    console.log('Foto seleccionada:', file.name, file.size, file.type)
     
-    // Basic validation
-    if (file.size > 5 * 1024 * 1024) {
-      setError('La foto es muy grande. Máximo 5MB.')
+    // Validar que sea una imagen
+    if (!file.type.startsWith('image/')) {
+      setError('Por favor selecciona un archivo de imagen válido.')
       return
     }
     
     setError(null)
-    setPhoto(file)
-    // Skip preview to avoid potential issues
+    setPhoto(null) // Reset mientras comprime
+    setCompressing(true)
+    
+    try {
+      // Comprimir imagen ANTES de guardar (reduce ~15MB a ~300KB)
+      const compressedFile = await compressImage(file, 1024, 0.7)
+      setPhoto(compressedFile)
+      console.log('Foto comprimida y lista:', compressedFile.size)
+    } catch (err) {
+      console.error('Error al comprimir:', err)
+      // Si falla la compresión, usar la original (el storage debería aceptarla si no es enorme)
+      setPhoto(file)
+    } finally {
+      setCompressing(false)
+    }
   }
 
   function removePhoto() {
@@ -166,7 +180,11 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
       
       <div className="form-group">
         <label>Foto del paquete (opcional)</label>
-        {!photo ? (
+        {compressing ? (
+          <div className="photo-preview" style={{ padding: '1rem', textAlign: 'center' }}>
+            ⏳ Comprimiendo imagen...
+          </div>
+        ) : !photo ? (
           <button 
             type="button" 
             className="btn-photo"
@@ -197,7 +215,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
       {error && <p className="form-error">{error}</p>}
       {success && <p className="form-success">✅ Paquete registrado con éxito</p>}
       <button type="submit" className="btn-primary" disabled={loading}>
-        {loading ? 'Registrando...' : '📦 Registrar Paquete'}
+        {loading ? (photo ? 'Subiendo foto y registrando...' : 'Registrando...') : '📦 Registrar Paquete'}
       </button>
     </form>
   )
