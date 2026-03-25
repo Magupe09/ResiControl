@@ -13,6 +13,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const fileInputRef = useRef(null)
+  const galleryInputRef = useRef(null)
 
   const torres = useMemo(() => {
     if (!apartamentos) return []
@@ -185,14 +186,25 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
             ⏳ Comprimiendo imagen...
           </div>
         ) : !photo ? (
-          <button 
-            type="button" 
-            className="btn-photo"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={loading}
-          >
-            📷 Agregar foto
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+            <button 
+              type="button" 
+              className="btn-photo"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading}
+            >
+              📷 Tomar foto
+            </button>
+            <button 
+              type="button" 
+              className="btn-photo"
+              onClick={() => galleryInputRef.current?.click()}
+              disabled={loading}
+              style={{ background: '#6b7280' }}
+            >
+              🖼️ Elegir de galería
+            </button>
+          </div>
         ) : (
           <div className="photo-preview">
             <span style={{ display: 'block', textAlign: 'center', padding: '0.5rem' }}>
@@ -207,7 +219,13 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
           accept="image/*"
           capture="environment"
           onChange={handlePhotoChange}
-          onAbort={() => console.log('Camera aborted')}
+          style={{ display: 'none' }}
+        />
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handlePhotoChange}
           style={{ display: 'none' }}
         />
       </div>
