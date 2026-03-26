@@ -142,17 +142,38 @@ export async function markDelivered(id, receiverName, deliveryPhotoUrl = null) {
 }
 
 export async function uploadPhoto(file) {
-  const fileName = `${Date.now()}-${file.name}`
-  const { data, error } = await supabase.storage
-    .from('paquetes-fotos')
-    .upload(fileName, file)
-  if (error) return { data: null, error }
+  // Usar Edge Function para subir la imagen (más robusto para móviles lentos)
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
   
-  const { data: urlData } = supabase.storage
-    .from('paquetes-fotos')
-    .getPublicUrl(fileName)
-  
-  return { data: urlData.publicUrl, error: null }
+  try {
+    // Crear FormData con el archivo
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    // Llamar a la Edge Function
+    const response = await fetch(
+      `${supabaseUrl}/functions/v1/compress-image`,
+      {
+        method: 'POST',
+        body: formData,
+        // No especificar content-type - el navegador lo hace automáticamente con FormData
+      }
+    )
+    
+    const result = await response.json()
+    
+    if (!response.ok || result.error) {
+      console.error('Error en Edge Function:', result.error || result.message)
+      return { data: null, error: new Error(result.error || result.message) }
+    }
+    
+    console.log('Foto subida exitosamente:', result.url)
+    return { data: result.url, error: null }
+    
+  } catch (err) {
+    console.error('Error al subir foto:', err)
+    return { data: null, error: err }
+  }
 }
 
 export async function getApartamentos() {

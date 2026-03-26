@@ -1,15 +1,24 @@
 import { useState, useRef, useMemo } from 'react'
 import { insertPackage, uploadPhoto } from '../supabase'
-import { compressImage } from '../utils/imageCompressor'
+
+// Ya no necesitamos compresión del lado del cliente
+// La Edge Function ahora maneja la subida directamente
+
+function formatBytes(bytes) {
+  if (!bytes) return '0 Bytes'
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
 
 function PackageForm({ guardId, onPackageAdded, apartamentos }) {
   const [selectedTower, setSelectedTower] = useState('')
   const [selectedApartment, setSelectedApartment] = useState('')
   const [residentPhone, setResidentPhone] = useState('')
   const [photo, setPhoto] = useState(null)
-  const [photoPreview, setPhotoPreview] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [compressing, setCompressing] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const fileInputRef = useRef(null)
@@ -44,7 +53,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
     }
   }
 
-  async function handlePhotoChange(e) {
+  function handlePhotoChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
     
@@ -57,28 +66,18 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
     }
     
     setError(null)
-    setPhoto(null) // Reset mientras comprime
-    setCompressing(true)
-    
-    try {
-      // Comprimir imagen ANTES de guardar (reduce ~15MB a ~300KB)
-      const compressedFile = await compressImage(file, 1024, 0.7)
-      setPhoto(compressedFile)
-      console.log('Foto comprimida y lista:', compressedFile.size)
-    } catch (err) {
-      console.error('Error al comprimir:', err)
-      // Si falla la compresión, usar la original (el storage debería aceptarla si no es enorme)
-      setPhoto(file)
-    } finally {
-      setCompressing(false)
-    }
+    // Guardar la foto directamente - la Edge Function se encarga de todo
+    setPhoto(file)
+    console.log('Foto lista para subir:', file.name, formatBytes(file.size))
   }
 
   function removePhoto() {
     setPhoto(null)
-    setPhotoPreview(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
+    }
+    if (galleryInputRef.current) {
+      galleryInputRef.current.value = ''
     }
   }
 
@@ -181,11 +180,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
       
       <div className="form-group">
         <label>Foto del paquete (opcional)</label>
-        {compressing ? (
-          <div className="photo-preview" style={{ padding: '1rem', textAlign: 'center' }}>
-            ⏳ Comprimiendo imagen...
-          </div>
-        ) : !photo ? (
+        {!photo ? (
           <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
             <button 
               type="button" 
@@ -208,7 +203,7 @@ function PackageForm({ guardId, onPackageAdded, apartamentos }) {
         ) : (
           <div className="photo-preview">
             <span style={{ display: 'block', textAlign: 'center', padding: '0.5rem' }}>
-              📷 {photo.name}
+              📷 {photo.name} ({formatBytes(photo.size)})
             </span>
             <button type="button" className="btn-remove-photo" onClick={removePhoto}>✕</button>
           </div>
