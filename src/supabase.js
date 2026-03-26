@@ -144,19 +144,23 @@ export async function markDelivered(id, receiverName, deliveryPhotoUrl = null) {
 export async function uploadPhoto(file) {
   // Usar Edge Function para subir la imagen (más robusto para móviles lentos)
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
   
   try {
     // Crear FormData con el archivo
     const formData = new FormData()
     formData.append('file', file)
     
-    // Llamar a la Edge Function
+    // Llamar a la Edge Function con la anon key en headers
     const response = await fetch(
       `${supabaseUrl}/functions/v1/compress-image`,
       {
         method: 'POST',
         body: formData,
-        // No especificar content-type - el navegador lo hace automáticamente con FormData
+        headers: {
+          'apikey': supabaseAnonKey,
+          'Authorization': `Bearer ${supabaseAnonKey}`
+        }
       }
     )
     
