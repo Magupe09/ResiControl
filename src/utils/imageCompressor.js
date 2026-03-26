@@ -1,24 +1,17 @@
 /**
  * Comprime una imagen usando el canvas del navegador.
- * Reduce significativamente el tamaño manteniendo calidad aceptable.
+ * Versión ultra-liviana optimizada para móviles con poca memoria.
  * 
  * @param {File} file - Archivo de imagen original
- * @param {number} maxWidth - Ancho máximo (default: 1024)
- * @param {number} quality - Calidad de compresión 0-1 (default: 0.7)
+ * @param {number} maxWidth - Ancho máximo (default: 600px para móviles lentos)
+ * @param {number} quality - Calidad de compresión 0-1 (default: 0.5 para compresión agresiva)
  * @returns {Promise<File>} - Archivo comprimido (o el original si falla)
  */
-export async function compressImage(file, maxWidth = 1024, quality = 0.7) {
-  // Si el archivo es pequeño (menor a 1MB), no comprimir - ya está bien
-  if (file.size < 1024 * 1024) {
-    console.log('Archivo pequeño, no se comprime:', formatBytes(file.size))
-    return file
-  }
-  
-  // Timeout de seguridad: si tarda más de 10 segundos, usar la original
+export async function compressImage(file, maxWidth = 600, quality = 0.5) {
+  // Timeout de seguridad: si tarda más de 8 segundos, usar la original
   const timeoutId = setTimeout(() => {
     console.warn('Timeout de compresión, usando imagen original')
-    throw new Error('Timeout de compresión')
-  }, 10000)
+  }, 8000)
   
   try {
     const result = await doCompress(file, maxWidth, quality)
@@ -46,6 +39,18 @@ function doCompress(file, maxWidth, quality) {
       let width = img.width
       let height = img.height
       
+      // PRE-REDUCCIÓN: Si la imagen es muy grande (más de 8MP), reducirla primero
+      // Esto evita que el canvas falle por límite de tamaño
+      const megapixels = (width * height) / 1000000
+      if (megapixels > 8) {
+        console.log('Imagen muy grande, pre-reducción:', megapixels.toFixed(1), 'MP')
+        // Reducir a 800px temporalmente para el proceso inicial
+        const scale = 800 / Math.max(width, height)
+        width = Math.round(width * scale)
+        height = Math.round(height * scale)
+      }
+      
+      // Luego reducir al tamaño final si es necesario
       if (width > maxWidth) {
         height = Math.round((height * maxWidth) / width)
         width = maxWidth
@@ -58,6 +63,9 @@ function doCompress(file, maxWidth, quality) {
         canvas.height = height
         
         const ctx = canvas.getContext('2d')
+        // Configurar para mejor rendimiento
+        ctx.imageSmoothingEnabled = true
+        ctx.imageSmoothingQuality = 'medium'
         ctx.drawImage(img, 0, 0, width, height)
         
         // Comprimir como JPEG con calidad reducida
