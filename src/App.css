@@ -124,6 +124,9 @@
 .header-top {
   text-align: center;
   padding-bottom: 1rem;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .header-top h1 {
@@ -142,6 +145,9 @@
   display: flex;
   justify-content: center;
   padding-top: 1rem;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .header-user {
@@ -1771,6 +1777,7 @@
 
   .header-top {
     padding-bottom: 0.25rem;
+    max-width: 100%;
   }
 
   .header-top h1 {
@@ -1780,6 +1787,10 @@
   .conjunto-name {
     font-size: 0.7rem;
     margin: 0.2rem 0 0;
+  }
+
+  .header-footer {
+    max-width: 100%;
   }
 
   .actions-container {
