@@ -1714,6 +1714,11 @@
     margin: 0;
   }
 
+  .header-center {
+    flex: none;
+    padding: 0.5rem 0;
+  }
+
   .action-main-btn {
     padding: 0.8rem 1rem;
     max-width: 240px;
