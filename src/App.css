@@ -1687,8 +1687,12 @@
 /* Celulares menores a 380px de ancho */
 @media (max-width: 380px) {
   .app-header {
-    padding: 1rem 0.75rem;
+    padding: 1.5rem 0.75rem;
     overflow: hidden;
+  }
+
+  .header-top {
+    margin-bottom: 1rem;
   }
 
   .header-top h1 {
@@ -1729,7 +1733,6 @@
 
   .header-user {
     gap: 0.4rem;
-    padding-top: 0.5rem;
   }
 
   .user-name {
@@ -1742,7 +1745,8 @@
   }
 
   .header-footer {
-    padding-top: 0.5rem;
+    padding-top: 1rem;
+    margin-top: auto;
   }
 
   .package-form {
