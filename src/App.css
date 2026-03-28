@@ -1688,12 +1688,12 @@
 /* Celulares menores a 380px de ancho */
 @media (max-width: 380px) {
   .app-header {
-    padding: 1.5rem 0.75rem;
+    padding: 2.5rem 0.75rem;
     overflow: hidden;
   }
 
   .header-top {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .header-top h1 {
@@ -1708,15 +1708,15 @@
 
   .actions-container {
     padding: 0;
-    gap: 0.7rem;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
   }
 
   .action-main-btn {
-    padding: 1rem 1.25rem;
-    max-width: 260px;
-    gap: 0.25rem;
+    padding: 0.8rem 1rem;
+    max-width: 240px;
+    gap: 0.2rem;
   }
 
   .action-main-btn .action-title {
@@ -1746,7 +1746,7 @@
   }
 
   .header-footer {
-    padding-top: 1rem;
+    padding-top: 1.5rem;
     margin-top: auto;
   }
 
