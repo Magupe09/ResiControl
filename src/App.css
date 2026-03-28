@@ -42,6 +42,7 @@
   justify-content: space-between;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* Dashboard (3 botones) - sin scroll */
