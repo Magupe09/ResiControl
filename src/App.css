@@ -1688,12 +1688,14 @@
 /* Celulares menores a 380px de ancho */
 @media (max-width: 380px) {
   .app-header {
-    padding: 2.5rem 0.75rem;
+    padding: 1rem 0.75rem;
     overflow: hidden;
+    justify-content: center;
+    gap: 0.5rem;
   }
 
   .header-top {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
   }
 
   .header-top h1 {
@@ -1709,8 +1711,7 @@
   .actions-container {
     padding: 0;
     gap: 0.5rem;
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
+    margin: 0;
   }
 
   .action-main-btn {
@@ -1746,8 +1747,8 @@
   }
 
   .header-footer {
-    padding-top: 1.5rem;
-    margin-top: auto;
+    padding-top: 0;
+    margin-top: 0;
   }
 
   .package-form {
