@@ -573,7 +573,7 @@
 .card-apartment {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #FCF300;
+  color: #000000;
   margin-top: 0.1rem;
 }
 
@@ -1733,8 +1733,9 @@
 /* Celulares menores a 380px de ancho */
 @media (max-width: 380px) {
   .app-header {
-    padding: 3rem 0.75rem;
-    overflow: hidden;
+    padding: 4rem 0.75rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     justify-content: space-between;
     gap: 0;
   }
@@ -1745,12 +1746,12 @@
   }
 
   .header-top h1 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     margin-bottom: 0.25rem;
   }
 
   .conjunto-name {
-    font-size: 0.85rem;
+    font-size: 1rem;
     margin-top: 0.25rem;
   }
 
@@ -1773,15 +1774,15 @@
   }
 
   .action-main-btn .action-title {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
 
   .action-main-btn .action-icon {
-    font-size: 2.2rem;
+    font-size: 3.2rem;
   }
 
   .action-main-btn .action-subtitle {
-    font-size: 0.8rem;
+    font-size: 1rem;
     display: block;
   }
 
@@ -1794,7 +1795,7 @@
   }
 
   .user-name {
-    font-size: 0.75rem;
+    font-size: 1rem;
   }
 
   .btn-logout {
@@ -1829,12 +1830,13 @@
     min-height: auto;
     height: 100vh;
     padding: 0.75rem;
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .header-center {
     padding: 0.25rem 0;
-    overflow: visible;
+    overflow-y: visible;
   }
 
   .header-top {
