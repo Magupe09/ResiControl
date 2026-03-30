@@ -44,8 +44,10 @@
   flex-direction: column;
   justify-content: space-between;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Dashboard (3 botones) - sin scroll */
@@ -60,8 +62,9 @@
 /* Vistas que necesitan scroll (receive, deliver, admin, resident) */
 .app-header .center-view {
   flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  overflow-y: visible;
   padding-bottom: 1rem;
 }
 
@@ -69,7 +72,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   overflow-y: visible;
   padding: 1rem 0;
 }
@@ -423,8 +425,6 @@
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  overflow-y: auto;
-  max-height: 85vh;
 }
 
 .package-form h2 {
@@ -501,8 +501,6 @@
 
 /* ── List ───────────────────────────── */
 .package-list {
-  overflow-y: auto;
-  max-height: 85vh;
   padding-bottom: 1rem;
 }
 
@@ -1009,8 +1007,6 @@
 
 .admin-table {
   overflow-x: auto;
-  overflow-y: auto;
-  max-height: 45vh;
 }
 
 .admin-table table {
@@ -1030,9 +1026,6 @@
   background: #f8fafc;
   font-weight: 600;
   color: #475569;
-  position: sticky;
-  top: 0;
-  z-index: 1;
 }
 
 .status-badge {
@@ -1065,8 +1058,6 @@
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  overflow-y: auto;
-  max-height: 85vh;
 }
 
 .admin-header {
@@ -1200,8 +1191,6 @@
 
 .admin-table {
   overflow-x: auto;
-  overflow-y: auto;
-  max-height: 45vh;
 }
 
 .admin-table table {
@@ -1221,9 +1210,6 @@
   background: #f8fafc;
   font-weight: 600;
   color: #475569;
-  position: sticky;
-  top: 0;
-  z-index: 1;
 }
 
 .status-badge {
