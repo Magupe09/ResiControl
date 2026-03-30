@@ -423,6 +423,8 @@
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  overflow-y: auto;
+  max-height: 85vh;
 }
 
 .package-form h2 {
@@ -498,6 +500,12 @@
 }
 
 /* ── List ───────────────────────────── */
+.package-list {
+  overflow-y: auto;
+  max-height: 85vh;
+  padding-bottom: 1rem;
+}
+
 .package-list h2 {
   font-size: 1.1rem;
   color: #ffffff;
@@ -1057,6 +1065,8 @@
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  overflow-y: auto;
+  max-height: 85vh;
 }
 
 .admin-header {
