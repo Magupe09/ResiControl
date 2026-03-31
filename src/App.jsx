@@ -128,7 +128,7 @@ function App() {
             )}
 
             {view === 'deliver' && (
-              <div className="center-view">
+              <div className="center-view deliver-view">
                 <button className="btn-back-action" onClick={handleBack}>
                   ← Volver
                 </button>
